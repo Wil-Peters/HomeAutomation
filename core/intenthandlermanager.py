@@ -3,13 +3,14 @@ from typing import Dict, List
 
 from core.intent import Intent
 from core.intentdefinition import IntentDefinition
+from core.intentdefinitionsource import IntentDefinitionSource
 from core.intenthandler import IntentHandler
 from core.newintentobserver import NewIntentObserver
 from core.speaker import Speaker
 from core.utils.classname import fullname
 
 
-class IntentHandlerManager(NewIntentObserver):
+class IntentHandlerManager(IntentDefinitionSource, NewIntentObserver):
     """The IntentHandlerManager is the central hub of the program. It receives new Intents from a
     NewIntentSubject and passes the Intent to the appropriate IntentHandler.
 
@@ -55,7 +56,7 @@ class IntentHandlerManager(NewIntentObserver):
                               intent_definition.name, intent_handler)
             self._intent_handlers[intent_definition.name] = intent_handler
 
-    def get_all_intent_definitions(self) -> List[IntentDefinition]:
+    def get_intent_definitions(self) -> List[IntentDefinition]:
         """Returns all IntentDefinition of all IntentHandlers which are subscribed to the
         IntentHandlerManager"""
         all_intent_definitions = []

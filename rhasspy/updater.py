@@ -10,6 +10,7 @@ from typing import Dict, List
 import requests
 
 from core.intentdefinition import IntentDefinition, SentenceParameter
+from core.intentdefinitionsource import IntentDefinitionSource
 from core.utils.classname import fullname
 
 
@@ -20,7 +21,8 @@ class RhasspyUpdater:
     To do this, call upload_intent_definitions_to_rhasspy and pass it a List of
     core.intentdefinition.IntentDefinition objects. After that, call the train method."""
 
-    def __init__(self):
+    def __init__(self, intent_definition_source: IntentDefinitionSource):
+        self._intent_definition_source = intent_definition_source
         self._logger = logging.getLogger(fullname(self))
         self._slots: Dict[str, List[str]] = {}
         config = configparser.ConfigParser()
@@ -49,9 +51,10 @@ class RhasspyUpdater:
     def _requires_slot_creation(possible_values: List[str]) -> bool:
         return len(possible_values) > 5
 
-    def upload_intent_definitions_to_rhasspy(self, intent_definitions: List[IntentDefinition]):
+    def update_rhasspy(self):
         """Takes a list of core.intentdefinition.IntentDefinition objects, breaks them down
         into Sentences & Slots and uploads them to Rhasspy"""
+        intent_definitions = self._intent_definition_source.get_intent_definitions()
         self._slots = self._get_slots(intent_definitions)
         sentences = self._generate_sentences(intent_definitions)
         if self._slots:

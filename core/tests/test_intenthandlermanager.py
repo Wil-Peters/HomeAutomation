@@ -38,7 +38,7 @@ class TestIntentManager(TestCase):
         intent_manager.subscribe_intent_handler(mock_intent_handler_1)
         intent_manager.subscribe_intent_handler(mock_intent_handler_2)
 
-        self.assertEqual(2, len(intent_manager.get_all_intent_definitions()))
+        self.assertEqual(2, len(intent_manager.get_intent_definitions()))
 
     def test_handle_exception_in_intent_handler(self):
         mock_intent_handler = Mock()

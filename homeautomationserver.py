@@ -18,9 +18,8 @@ if __name__ == "__main__":
     INTENT_HANDLER_MANAGER = IntentHandlerManagerFactory().create_intent_handler_manager(SPEAKER)
     INTENT_HANDLER_MANAGER.subscribe_intent_handler(SPEAKER)
 
-    INTENT_DEFINITIONS = INTENT_HANDLER_MANAGER.get_all_intent_definitions()
-    UPDATER = RhasspyUpdater()
-    UPDATER.upload_intent_definitions_to_rhasspy(INTENT_DEFINITIONS)
+    UPDATER = RhasspyUpdater(INTENT_HANDLER_MANAGER)
+    UPDATER.update_rhasspy()
     UPDATER.train()
 
     NEW_INTENT_SUBJECT = NewIntentSubjectFactory.create_new_intent_subject()
@@ -28,4 +27,3 @@ if __name__ == "__main__":
 
     while True:
         time.sleep(1000)
-# test
