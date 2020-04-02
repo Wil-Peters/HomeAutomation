@@ -1,7 +1,7 @@
 """This module provides """
 
 from core.intent import Intent
-from core.intentdefinition import IntentDefinition, Sentence, SentenceParameter
+from core.intentdefinition import IntentDefinition, Sentence, SentenceBuilder, SentenceParameter
 from core.intenthandler import IntentHandler
 from core.speaker import Speaker
 from rhasspy.speech import RhasspySpeech
@@ -25,12 +25,15 @@ class SpeechManager(Speaker, IntentHandler):
     @staticmethod
     def _create_speaker_select_intent_definition():
         intent_definition = IntentDefinition("SelectSpeaker")
-        sentence = Sentence()
-        sentence.add_string("Talk to me on (the)")
 
         speaker_parameter = SentenceParameter(SpeechManager.SPEAKER, True,
                                               [SpeechManager.SONOS, SpeechManager.RASPBERRY])
-        sentence.add_parameter(speaker_parameter)
+
+        sentence_builder = SentenceBuilder()
+        sentence_builder.add_string("Talk to me on (the)").add_parameter(speaker_parameter)
+
+        sentence = sentence_builder.build()
+
         intent_definition.add_sentence(sentence)
         return intent_definition
 

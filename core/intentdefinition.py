@@ -1,5 +1,6 @@
 """This module contains classes that can be used to construct an IntentDefinition, a kind of
 blueprint for the Intent an IntentHandler can handle."""
+from __future__ import annotations
 from typing import List
 
 
@@ -53,6 +54,22 @@ class Sentence(object):
     def add_parameter(self, sentence_part: SentenceParameter):
         """Add a parameter to the Sentence"""
         self._sentence_parts.append(sentence_part)
+
+
+class SentenceBuilder(object):
+    def __init__(self):
+        self._sentence = Sentence()
+
+    def add_string(self, text: str) -> SentenceBuilder:
+        self._sentence.add_string(text)
+        return self
+
+    def add_parameter(self, parameter: SentenceParameter) -> SentenceBuilder:
+        self._sentence.add_parameter(parameter)
+        return self
+
+    def build(self) -> Sentence:
+        return self._sentence
 
 
 class IntentDefinition(object):
