@@ -1,11 +1,12 @@
 @startuml
+package core <<Rectangle>> {
 abstract class NewIntentSubject
 abstract class NewIntentObserver
 abstract class IntentDefinitionSource
 abstract class Speaker
 abstract class IntentHandler
 
-RhasspyIntentReceiver --|> NewIntentSubject
+
 NewIntentSubject -> NewIntentObserver
 NewIntentObserver <|-- IntentHandlerManager
 IntentHandlerManager --> IntentHandler
@@ -14,5 +15,11 @@ IntentDefinitionSource <|-- IntentHandlerManager
 IntentHandler -> IntentDefinition
 IntentDefinition *-- Sentence
 Sentence --> SentenceParameter
+}
+
+package rhasspy <<Rectangle>> {
+
+RhasspyIntentReceiver --|> NewIntentSubject
 RhasspyUpdater --> IntentDefinitionSource
+}
 @enduml
