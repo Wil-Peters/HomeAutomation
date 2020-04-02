@@ -1,7 +1,7 @@
 import json
 
 from core.intent import Intent
-from core.intentdefinition import IntentDefinition, Sentence, SentenceBuilder, SentenceParameter
+from core.intentdefinition import IntentDefinition, SentenceBuilder, SentenceParameter
 from core.intenthandler import IntentHandler
 from philipshue.huemanager import HueManager
 

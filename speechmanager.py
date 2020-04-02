@@ -1,7 +1,7 @@
 """This module provides """
 
 from core.intent import Intent
-from core.intentdefinition import IntentDefinition, Sentence, SentenceBuilder, SentenceParameter
+from core.intentdefinition import IntentDefinition, SentenceBuilder, SentenceParameter
 from core.intenthandler import IntentHandler
 from core.speaker import Speaker
 from rhasspy.speech import RhasspySpeech
