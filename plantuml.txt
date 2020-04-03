@@ -1,0 +1,37 @@
+@startuml
+package core <<Rectangle>> {
+abstract class NewIntentSubject
+abstract class NewIntentObserver
+abstract class IntentDefinitionSource
+abstract class Speaker
+abstract class IntentHandler
+abstract class Intent
+
+
+NewIntentSubject -> NewIntentObserver
+NewIntentObserver <|-- IntentHandlerManager
+IntentHandlerManager --> IntentHandler
+IntentHandlerManager -> Speaker
+IntentDefinitionSource <|-- IntentHandlerManager
+IntentHandler -> IntentDefinition
+IntentDefinition *-- Sentence
+Sentence --> SentenceParameter
+}
+
+package rhasspy <<Rectangle>> {
+
+RhasspyIntentReceiver --|> NewIntentSubject
+RhasspyIntentReceiver --> Intent
+RhasspyUpdater --> IntentDefinitionSource
+}
+
+package intenthandlers <<Rectangle>> {
+TimeIntentHandler --|> IntentHandler
+WeatherIntentHandler --|> IntentHandler
+LightsInRoomOnOffHandler --|> IntentHandler
+}
+
+package sonos <<Rectangle>> {
+SonosSpeaker --|> Speaker
+}
+@enduml

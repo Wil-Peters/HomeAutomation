@@ -1,7 +1,7 @@
 import json
 
 from core.intent import Intent
-from core.intentdefinition import IntentDefinition, Sentence, SentenceParameter
+from core.intentdefinition import IntentDefinition, SentenceBuilder, SentenceParameter
 from core.intenthandler import IntentHandler
 from philipshue.huemanager import HueManager
 
@@ -25,23 +25,25 @@ class RoomDimmer(IntentHandler):
     def get_dim_room_intent_definition(self):
         dim_room = IntentDefinition("DimRoom")
 
-        sentence = Sentence()
-        sentence.add_string("Dim the lights in the")
-
         room_names = [room.name for room in self._hue_manager.groups]
         room_parameter = SentenceParameter(self.ROOM, True, possible_values=room_names)
-        sentence.add_parameter(room_parameter)
-        parameter2 = SentenceParameter(self.UP_DOWN, True, possible_values=[self.UP, self.DOWN])
-        sentence.add_parameter(parameter2)
-
-        dim_room.add_sentence(sentence)
-
-        sentence2 = Sentence()
-        indecrease_parameter = SentenceParameter(self.IN_DECREASE, True, possible_values=[
+        up_down_parameter = SentenceParameter(self.UP_DOWN, True, possible_values=[self.UP, self.DOWN])
+        in_decrease_parameter = SentenceParameter(self.IN_DECREASE, True, possible_values=[
             self.INCREASE, self.DECREASE])
-        sentence2.add_parameter(indecrease_parameter)
-        sentence2.add_string("the brightness in the")
-        sentence2.add_parameter(room_parameter)
+
+        sentence_builder = SentenceBuilder()
+        sentence_builder.add_string("Dim the lights in the")\
+            .add_parameter(room_parameter)\
+            .add_parameter(up_down_parameter)
+        sentence = sentence_builder.build()
+
+        sentence_builder2 = SentenceBuilder()
+        sentence_builder2.add_parameter(in_decrease_parameter)\
+            .add_string("the brightness in the")\
+            .add_parameter(room_parameter)
+
+        sentence2 = sentence_builder2.build()
+        dim_room.add_sentence(sentence)
         dim_room.add_sentence(sentence2)
 
         return dim_room
