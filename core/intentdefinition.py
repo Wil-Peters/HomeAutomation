@@ -1,6 +1,5 @@
 """This module contains classes that can be used to construct an IntentDefinition, a kind of
 blueprint for the Intent an IntentHandler can handle."""
-from __future__ import annotations
 from typing import List
 
 
@@ -60,11 +59,11 @@ class SentenceBuilder(object):
     def __init__(self):
         self._sentence = Sentence()
 
-    def add_string(self, text: str) -> SentenceBuilder:
+    def add_string(self, text: str):
         self._sentence.add_string(text)
         return self
 
-    def add_parameter(self, parameter: SentenceParameter) -> SentenceBuilder:
+    def add_parameter(self, parameter: SentenceParameter):
         self._sentence.add_parameter(parameter)
         return self
 
