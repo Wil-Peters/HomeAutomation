@@ -64,4 +64,4 @@ What Rhasspy does is recognize what a user wants when they give a command to the
 
 Design:
 
-![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Wil-Peters/HomeAutomation/development/plantuml.txt)
+![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Wil-Peters/HomeAutomation/master/plantuml.txt)
