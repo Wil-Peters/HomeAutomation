@@ -62,6 +62,13 @@ What Rhasspy does is recognize what a user wants when they give a command to the
 
 - Enables the use of multiple speakers, so you can choose on which device your voice assistant answers you. For me personally, I want my voice assistant to be able to answer me on my Sonos speaker, so I built support for that.
 
+- The classes in the asynchronous module allow you to do text to speech on your Rhasspy, even when there was no intent. The TimerIntentHandler is a first example that implements this functionality. With it you can:
+
+    - Create a timer for x number of seconds/minutes from now (I have an issue with that at the moment, check Problems with Number Ranges & Converters for details)
+    - Rhasspy responds that the timer was set
+    - After the timer expires, the TriggerManager is notified and in turn uses text-to-speech to tell you on your Rhasspy that the timer ended.
+
+
 Design:
 
 ![alternative text](http://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/Wil-Peters/HomeAutomation/master/plantuml.txt)
