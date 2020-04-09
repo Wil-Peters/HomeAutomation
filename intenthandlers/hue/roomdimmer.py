@@ -1,7 +1,7 @@
 import json
 
 from core.intent import Intent
-from core.intentdefinition import IntentDefinition, SentenceBuilder, SentenceParameter
+from core.intentdefinition import IntentDefinition, SentenceBuilder, SetParameter
 from core.intenthandler import IntentHandler
 from philipshue.huemanager import HueManager
 
@@ -26,9 +26,9 @@ class RoomDimmer(IntentHandler):
         dim_room = IntentDefinition("DimRoom")
 
         room_names = [room.name for room in self._hue_manager.groups]
-        room_parameter = SentenceParameter(self.ROOM, True, possible_values=room_names)
-        up_down_parameter = SentenceParameter(self.UP_DOWN, True, possible_values=[self.UP, self.DOWN])
-        in_decrease_parameter = SentenceParameter(self.IN_DECREASE, True, possible_values=[
+        room_parameter = SetParameter(self.ROOM, True, possible_values=room_names)
+        up_down_parameter = SetParameter(self.UP_DOWN, True, possible_values=[self.UP, self.DOWN])
+        in_decrease_parameter = SetParameter(self.IN_DECREASE, True, possible_values=[
             self.INCREASE, self.DECREASE])
 
         sentence_builder = SentenceBuilder()

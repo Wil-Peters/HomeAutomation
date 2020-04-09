@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import call, patch, Mock
+from unittest.mock import MagicMock, Mock
 
 from core.intenthandlermanager import IntentHandlerManager
 from core.intentdefinition import IntentDefinition
@@ -27,6 +27,7 @@ class TestIntentReceiverIntentHandlerManagerIntegration(TestCase):
     def test_new_intent(self):
         mock_intent_handler = Mock()
         mock_intent_handler.intent_definitions = [IntentDefinition("Test", "Test text")]
+        mock_intent_handler.handle_intent = MagicMock(return_value="Test response")
 
         intent_handler_manager = IntentHandlerManager()
         intent_receiver = RhasspyIntentReceiver()
@@ -36,5 +37,21 @@ class TestIntentReceiverIntentHandlerManagerIntegration(TestCase):
         intent_handler_manager.subscribe_intent_handler(mock_intent_handler)
 
         response = intent_receiver.handle_new_intent(self._intent_string)
-        expected_response = '{"intent": "Test", "time_sec": 0.0}'
+        expected_response = '{"intent": "Test", "time_sec": 0.0, "response": "Test response"}'
+        self.assertEqual(expected_response, response)
+
+    def test_new_intent_without_response(self):
+        mock_intent_handler = Mock()
+        mock_intent_handler.intent_definitions = [IntentDefinition("Test", "Test text")]
+        mock_intent_handler.handle_intent = MagicMock(return_value=None)
+
+        intent_handler_manager = IntentHandlerManager()
+        intent_receiver = RhasspyIntentReceiver()
+
+        intent_receiver.attach(intent_handler_manager)
+
+        intent_handler_manager.subscribe_intent_handler(mock_intent_handler)
+
+        response = intent_receiver.handle_new_intent(self._intent_string)
+        expected_response = '{"intent": "Test", "time_sec": 0.0, "response": ""}'
         self.assertEqual(expected_response, response)

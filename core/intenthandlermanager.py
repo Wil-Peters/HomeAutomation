@@ -21,26 +21,29 @@ class IntentHandlerManager(IntentDefinitionSource, NewIntentObserver):
         self._intent_handlers: Dict[str, IntentHandler] = {}
         self._speaker = speaker
 
-    def update(self, intent: Intent) -> None:
+    def update(self, intent: Intent) -> str:
         """Implements NewIntentObserver.update. Gets called when the NewIntentSubject has a new
         Intent for its observers."""
         if intent.name in self._intent_handlers.keys():
             text_to_speak = self._handle_intent(intent)
         else:
             self._logger.info("Intent Manager: no intenthandler registered for: %s", intent.name)
-            text_to_speak = "I do no know how to %s" % intent.full_intent_string
+            text_to_speak = "I do not know how to %s" % intent.full_intent_string
         if self._speaker:
             self._speaker.speak_text(text_to_speak)
+            return ""
+        else:
+            return text_to_speak
 
     def _handle_intent(self, intent) -> str:
         result = ""
-        self._logger.info("Intent Manager: dispatching intenthandlers '%s'", intent.name)
+        self._logger.info("Intent Manager: dispatching intent '%s'", intent.name)
         try:
             response = self._intent_handlers[intent.name].handle_intent(intent)
             if response:
                 result = response
         except Exception as exception:
-            self._logger.info("Exception occurred in intenthandlers handler [%s]: %s",
+            self._logger.info("Exception occurred in intent handler [%s]: %s",
                               fullname(self._intent_handlers[intent.name]), exception)
             result = "Something went wrong while handling your request: %s" % \
                      intent.full_intent_string
@@ -52,7 +55,7 @@ class IntentHandlerManager(IntentDefinitionSource, NewIntentObserver):
         Only the IntentHandler which exposes a certain IntentDefinition will be called when
         update() is called with that Intent"""
         for intent_definition in intent_handler.intent_definitions:
-            self._logger.info("Added subscription on intenthandlers [%s] for %s",
+            self._logger.info("Added subscription on intent [%s] for %s",
                               intent_definition.name, intent_handler)
             self._intent_handlers[intent_definition.name] = intent_handler
 

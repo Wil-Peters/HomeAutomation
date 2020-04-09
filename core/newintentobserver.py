@@ -8,5 +8,5 @@ class NewIntentObserver(ABC):
     interface between the part of the code where the origin of the Intent lies, and the part
     where the Intent is handled."""
     @abstractmethod
-    def update(self, intent: Intent) -> None:
+    def update(self, intent: Intent) -> str:
         pass

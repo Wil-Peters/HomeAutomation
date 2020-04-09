@@ -9,7 +9,7 @@ from typing import Dict, List
 
 import requests
 
-from core.intentdefinition import IntentDefinition, SentenceParameter
+from core.intentdefinition import IntentDefinition, NumberRangeParameter, SetParameter, StringParameter
 from core.intentdefinitionsource import IntentDefinitionSource
 from core.utils.classname import fullname
 
@@ -83,7 +83,7 @@ class RhasspyUpdater:
         for intent_definition in intent_definitions:
             for sentence in intent_definition.sentences:
                 for part in sentence:
-                    if isinstance(part, SentenceParameter) and \
+                    if isinstance(part, SetParameter) and \
                             self._requires_slot_creation(part.possible_values):
                         slot_name, slot_value = self._generate_slot_for_part(slots,
                                                                              intent_definition.name,
@@ -93,25 +93,34 @@ class RhasspyUpdater:
 
     @staticmethod
     def _generate_slot_for_part(slots: Dict[str, List[str]], intent_definition_name: str,
-                                part: SentenceParameter):
+                                part: SetParameter):
         slot_name = part.name
         if part.name in slots:
             if slots[part.name] != part.possible_values:
                 slot_name = "{}_{}".format(intent_definition_name, part.name)
         return slot_name, part.possible_values
 
-    def _get_part_string(self, part: SentenceParameter):
-        return_value: str = part if isinstance(part, str) else ""
-        if isinstance(part, SentenceParameter):
+    def _get_part_string(self, part: SetParameter):
+        return_value = ""
+        if isinstance(part, StringParameter):
+            if part.optional:
+                return_value = "[{}]".format(part.text)
+            else:
+                return_value = part.text
+        if isinstance(part, SetParameter):
             slot_name = part.name
             if self._requires_slot_creation(part.possible_values):
                 slot_name = [key for key, values in self._slots.items()
                              if values == part.possible_values][0]
             return_value = self._create_option_string(part, slot_name, part.return_value)
+        if isinstance(part, NumberRangeParameter):
+            return_value = "({}..{})".format(part.lower_value, part.upper_value)
+            return_value += RhasspyUpdater.get_return_value_string_if_necessary(part.return_value,
+                                                                                part)
         return return_value
 
     @staticmethod
-    def _create_option_string(parameter: SentenceParameter,
+    def _create_option_string(parameter: SetParameter,
                               slot_name: str,
                               add_return_value: bool = False) -> str:
         option_string = ""
@@ -124,6 +133,16 @@ class RhasspyUpdater:
             option_string += ")"
         else:
             option_string += "${}".format(slot_name)
-        if add_return_value:
-            option_string += "{{{}}}".format(parameter.name)
+        option_string += RhasspyUpdater.get_return_value_string_if_necessary(add_return_value,
+                                                                             parameter)
         return option_string
+
+    @staticmethod
+    def get_return_value_string_if_necessary(add_return_value, parameter):
+        response = ""
+        if add_return_value:
+            f = "{{{}}}"
+            if isinstance(parameter, NumberRangeParameter):
+                f = "{{{}!int}}"
+            response = f.format(parameter.name)
+        return response

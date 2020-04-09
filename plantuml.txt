@@ -1,34 +1,57 @@
 @startuml
 package core <<Rectangle>> {
+
+  package intentdefinition <<Rectangle>> {
+    IntentDefinition *-- Sentence
+    Sentence --> SentenceParameter
+  }
+
+  package asynchronous <<Rectangle>> {
+    abstract class AsyncVoiceListener
+    abstract class AsyncVoiceSource
+    abstract class Trigger
+
+    Trigger <|-- Reminder
+    Trigger <|-- Notification
+  }
+
 abstract class NewIntentSubject
 abstract class NewIntentObserver
 abstract class IntentDefinitionSource
 abstract class Speaker
 abstract class IntentHandler
-abstract class Intent
 
 
-NewIntentSubject -> NewIntentObserver
+
+
+NewIntentObserver <- NewIntentSubject
 NewIntentObserver <|-- IntentHandlerManager
 IntentHandlerManager --> IntentHandler
-IntentHandlerManager -> Speaker
-IntentDefinitionSource <|-- IntentHandlerManager
-IntentHandler -> IntentDefinition
-IntentDefinition *-- Sentence
-Sentence --> SentenceParameter
+Speaker <- IntentHandlerManager
+IntentDefinitionSource <-- IntentHandlerManager
+IntentHandler --> IntentDefinition
+
+
+TriggerManager --|> AsyncVoiceListener
+IntentHandler <|-- TriggerManager
+NewIntentSubject --> Intent
+IntentHandler --> Intent
 }
 
 package rhasspy <<Rectangle>> {
 
 RhasspyIntentReceiver --|> NewIntentSubject
-RhasspyIntentReceiver --> Intent
-RhasspyUpdater --> IntentDefinitionSource
+RhasspyUpdater --|> IntentDefinitionSource
 }
 
 package intenthandlers <<Rectangle>> {
-TimeIntentHandler --|> IntentHandler
-WeatherIntentHandler --|> IntentHandler
-LightsInRoomOnOffHandler --|> IntentHandler
+IntentHandler <|-- TimeIntentHandler
+IntentHandler <|-- WeatherIntentHandler
+IntentHandler <|-- LightsInRoomOnOffHandler
+IntentHandler <|-- TimerIntentHandler
+TimerIntentHandler --|> AsyncVoiceSource
+AsyncVoiceSource --> AsyncVoiceListener
+AsyncVoiceListener --> Trigger
 }
 
 package sonos <<Rectangle>> {

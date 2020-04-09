@@ -13,4 +13,4 @@ class TestWeatherIntentHandler(TestCase):
         sentences = intent_definitions[0].sentences
         self.assertEqual(1, len(sentences))
         self.assertEqual(1, len(sentences[0]))
-        self.assertEqual("How (warm | hot | cold) is it", sentences[0][0])
+        self.assertEqual("How (warm | hot | cold) is it", sentences[0][0].text)

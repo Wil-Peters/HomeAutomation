@@ -18,7 +18,7 @@ class TestTimeIntentHandler(TestCase):
         sentences = intent_definitions[0].sentences
         self.assertEqual(1, len(sentences))
         self.assertEqual(1, len(sentences[0]))
-        self.assertEqual("What time is it", sentences[0][0])
+        self.assertEqual("What time is it", sentences[0][0].text)
 
     def test_handle_intent(self):
         localtime = time.localtime()

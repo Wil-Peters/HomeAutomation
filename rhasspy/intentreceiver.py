@@ -6,7 +6,6 @@ import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from io import BytesIO
 from threading import Thread
-from typing import List
 
 from core.intent import Intent
 from core.newintentobserver import NewIntentObserver
@@ -39,7 +38,7 @@ class RhasspyIntentReceiver(NewIntentSubject):
 
     HOST = ''
     PORT = 8081
-    _intent_listeners: List[NewIntentObserver] = []
+    _intent_listener = None
 
     def __init__(self):
         self._logger = logging.getLogger(fullname(self))
@@ -54,21 +53,22 @@ class RhasspyIntentReceiver(NewIntentSubject):
         incoming_time = time.time()
         self._logger.info("Received intent: %s", intent_string)
         intent = self._create_intent_object(intent_string)
-        for intent_listener in RhasspyIntentReceiver._intent_listeners:
-            intent_listener.update(intent)
-        return self._create_return_body(intent, incoming_time)
+        response = ""
+        if RhasspyIntentReceiver._intent_listener:
+            response = RhasspyIntentReceiver._intent_listener.update(intent)
+        return self._create_return_body(intent, incoming_time, response)
 
     def attach(self, observer: NewIntentObserver):
         """Attaches a new observer which implements the core.newintentobserver.NewIntentObserver
         class"""
         self._logger.info("Attached observer: %s", observer)
-        RhasspyIntentReceiver._intent_listeners.append(observer)
+        RhasspyIntentReceiver._intent_listener = observer
 
     def detach(self, observer: NewIntentObserver):
         """Detaches an observer which implements the core.newintentobserver.NewIntentObserver
         class"""
         self._logger.info("Detached observer: %s", observer)
-        RhasspyIntentReceiver._intent_listeners.remove(observer)
+        RhasspyIntentReceiver._intent_listener = None
 
     def _run_server(self):
         httpd = HTTPServer((self.HOST, self.PORT), SimpleHTTPRequestHandler)
@@ -83,6 +83,7 @@ class RhasspyIntentReceiver(NewIntentSubject):
         return Intent(name, intent_dict["text"])
 
     @staticmethod
-    def _create_return_body(intent: Intent, timestamp: float):
-        response_dict = {"intent": intent.name, "time_sec": round(time.time() - timestamp, 2)}
+    def _create_return_body(intent: Intent, timestamp: float, response: str):
+        response_dict = {"intent": intent.name, "time_sec": round(time.time() - timestamp, 2),
+                         "response": response}
         return json.dumps(response_dict)

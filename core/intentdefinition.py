@@ -1,14 +1,14 @@
 """This module contains classes that can be used to construct an IntentDefinition, a kind of
 blueprint for the Intent an IntentHandler can handle."""
+from abc import ABC
 from typing import List
 
 
-class SentenceParameter(object):
+class SentenceParameter(ABC):
     """Represents a part of the Sentence where the user can give a certain "input"."""
-    def __init__(self, name: str, return_value=False, possible_values: List[str] = []):
+    def __init__(self, name: str, return_value=False):
         self._name = name
         self._return_value = return_value
-        self._possible_values = possible_values
 
     @property
     def name(self) -> str:
@@ -22,10 +22,46 @@ class SentenceParameter(object):
         """
         return self._return_value
 
+
+class SetParameter(SentenceParameter):
+
+    def __init__(self, name: str, return_value=False, possible_values: List[str] = []):
+        SentenceParameter.__init__(self, name, return_value)
+        self._possible_values = possible_values
+
     @property
     def possible_values(self) -> List[str]:
         """Represents a list of possible values for the parameter"""
         return self._possible_values
+
+
+class NumberRangeParameter(SentenceParameter):
+    def __init__(self, name: str, return_value=False, lower: int = 0, upper: int = 0):
+        SentenceParameter.__init__(self, name, return_value)
+        self._lower = lower
+        self._upper = upper
+
+    @property
+    def lower_value(self) -> int:
+        return self._lower
+
+    @property
+    def upper_value(self) -> int:
+        return self._upper
+
+
+class StringParameter(object):
+    def __init__(self, text, opt):
+        self._text = text
+        self._optional = opt
+
+    @property
+    def text(self) -> str:
+        return self._text
+
+    @property
+    def optional(self) -> bool:
+        return self._optional
 
 
 class Sentence(object):
@@ -46,9 +82,9 @@ class Sentence(object):
     def __getitem__(self, index):
         return self._sentence_parts[index]
 
-    def add_string(self, sentence_part: str):
+    def add_string(self, sentence_part: str, optional: bool = False):
         """Add a string to the Sentence"""
-        self._sentence_parts.append(sentence_part)
+        self._sentence_parts.append(StringParameter(sentence_part, optional))
 
     def add_parameter(self, sentence_part: SentenceParameter):
         """Add a parameter to the Sentence"""
@@ -59,8 +95,8 @@ class SentenceBuilder(object):
     def __init__(self):
         self._sentence = Sentence()
 
-    def add_string(self, text: str):
-        self._sentence.add_string(text)
+    def add_string(self, text: str, optional: bool = False):
+        self._sentence.add_string(text, optional)
         return self
 
     def add_parameter(self, parameter: SentenceParameter):

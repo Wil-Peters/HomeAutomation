@@ -1,7 +1,7 @@
 import json
 
 from core.intent import Intent
-from core.intentdefinition import IntentDefinition, SentenceBuilder, SentenceParameter
+from core.intentdefinition import IntentDefinition, SentenceBuilder, SetParameter
 from core.intenthandler import IntentHandler
 from philipshue.huemanager import HueManager
 
@@ -23,8 +23,9 @@ class LightsInRoomOnOffHandler(IntentHandler):
         room_on_off = IntentDefinition("TurnLightsInRoomOnOff")
 
         room_names = [room.name for room in self._hue_manager.groups]
-        room_parameter = SentenceParameter(self.ROOM, True, possible_values=room_names)
-        on_off_parameter = SentenceParameter(self.ONOFF, True, possible_values=[self.ON, self.OFF])
+        room_parameter = SetParameter(self.ROOM, True, possible_values=room_names)
+
+        on_off_parameter = SetParameter(self.ONOFF, True, possible_values=[self.ON, self.OFF])
 
         sentence_builder = SentenceBuilder()
         sentence_builder.add_string("Turn the lights in the")\

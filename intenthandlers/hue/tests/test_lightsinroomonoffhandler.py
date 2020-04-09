@@ -8,9 +8,10 @@ from philipshue.huemanager import Group
 
 class TestLightsInRoomOnOffHandler(TestCase):
 
-    @patch("intenthandlers.hue.lightsinroomonoffhandler.HueManager")
-    def test_get_intent_definitions(self, mocked_hue_manager):
-        mocked_hue_manager.groups.return_value = [Group("Test", 1), Group("Test2", 2)]
+    @patch('intenthandlers.hue.lightsinroomonoffhandler.HueManager')
+    def test_get_intent_definitions(self, hue_manager):
+        hue_manager_instance = hue_manager.return_value
+        hue_manager_instance.get_group_by_name = Mock(return_value=Group("Living room", 13))
         room_on_off_handler = LightsInRoomOnOffHandler()
         intent_definition = room_on_off_handler.intent_definitions[0]
         self.assertEqual("TurnLightsInRoomOnOff", intent_definition.name)
