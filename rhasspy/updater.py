@@ -114,7 +114,7 @@ class RhasspyUpdater:
                              if values == part.possible_values][0]
             return_value = self._create_option_string(part, slot_name, part.return_value)
         if isinstance(part, NumberRangeParameter):
-            return_value = "({}..{})".format(part.lower_value, part.upper_value)
+            return_value = "{}..{}".format(part.lower_value, part.upper_value)
             return_value += RhasspyUpdater.get_return_value_string_if_necessary(part.return_value,
                                                                                 part)
         return return_value
