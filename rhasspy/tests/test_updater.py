@@ -299,6 +299,6 @@ class TestRhasspyUpdater(TestCase):
         updater.update_rhasspy()
 
         requests_mock.assert_called_once()
-        expected_intent_in_call = "[TestIntent]\n(-5..31){Test!int}"
+        expected_intent_in_call = "[TestIntent]\n-5..31{Test!int}"
         requests_mock.assert_has_calls([mock.call(self.SENTENCES_URL, expected_intent_in_call)])
 
