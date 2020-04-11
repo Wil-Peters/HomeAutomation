@@ -1,0 +1,3 @@
+[submodule "thirdparty/rhasspy_weather"]
+	path = thirdparty/rhasspy_weather
+	url = https://github.com/Daenara/rhasspy_weather
