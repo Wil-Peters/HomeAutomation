@@ -6,9 +6,10 @@ from typing import List
 
 class SentenceParameter(ABC):
     """Represents a part of the Sentence where the user can give a certain "input"."""
-    def __init__(self, name: str, return_value=False):
+    def __init__(self, name: str, return_value, optional):
         self._name = name
         self._return_value = return_value
+        self._optional = optional
 
     @property
     def name(self) -> str:
@@ -22,11 +23,15 @@ class SentenceParameter(ABC):
         """
         return self._return_value
 
+    @property
+    def optional(self) -> bool:
+        return self._optional
+
 
 class SetParameter(SentenceParameter):
 
-    def __init__(self, name: str, return_value=False, possible_values: List[str] = []):
-        SentenceParameter.__init__(self, name, return_value)
+    def __init__(self, name: str, return_value=False, possible_values: List[str] = [], optional=False):
+        SentenceParameter.__init__(self, name, return_value, optional)
         self._possible_values = possible_values
 
     @property
@@ -36,8 +41,8 @@ class SetParameter(SentenceParameter):
 
 
 class NumberRangeParameter(SentenceParameter):
-    def __init__(self, name: str, return_value=False, lower: int = 0, upper: int = 0):
-        SentenceParameter.__init__(self, name, return_value)
+    def __init__(self, name: str, return_value=False, lower: int = 0, upper: int = 0, optional=False):
+        SentenceParameter.__init__(self, name, return_value, optional)
         self._lower = lower
         self._upper = upper
 
@@ -51,9 +56,10 @@ class NumberRangeParameter(SentenceParameter):
 
 
 class StringParameter(object):
-    def __init__(self, text, opt):
+    def __init__(self, text, optional=False, substitute=False):
         self._text = text
-        self._optional = opt
+        self._optional = optional
+        self._substitute = substitute
 
     @property
     def text(self) -> str:
@@ -62,6 +68,10 @@ class StringParameter(object):
     @property
     def optional(self) -> bool:
         return self._optional
+
+    @property
+    def substitute(self) -> bool:
+        return self._substitute
 
 
 class Sentence(object):
@@ -82,9 +92,9 @@ class Sentence(object):
     def __getitem__(self, index):
         return self._sentence_parts[index]
 
-    def add_string(self, sentence_part: str, optional: bool = False):
+    def add_string(self, sentence_part: str, optional: bool = False, substitute: bool = False):
         """Add a string to the Sentence"""
-        self._sentence_parts.append(StringParameter(sentence_part, optional))
+        self._sentence_parts.append(StringParameter(sentence_part, optional, substitute))
 
     def add_parameter(self, sentence_part: SentenceParameter):
         """Add a parameter to the Sentence"""
@@ -95,8 +105,8 @@ class SentenceBuilder(object):
     def __init__(self):
         self._sentence = Sentence()
 
-    def add_string(self, text: str, optional: bool = False):
-        self._sentence.add_string(text, optional)
+    def add_string(self, text: str, optional: bool = False, substitute: bool = False):
+        self._sentence.add_string(text, optional, substitute)
         return self
 
     def add_parameter(self, parameter: SentenceParameter):
