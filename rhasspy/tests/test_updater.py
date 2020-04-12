@@ -305,9 +305,8 @@ class TestRhasspyUpdater(TestCase):
     @mock.patch("rhasspy.updater.requests.post")
     def test_variable(self, requests_mock):
         named_days = ["today", "tomorrow", "the day after tomorrow"]
-        weekday_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-        month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
-                       "November", "December"]
+        weekday_names = ["Monday", "Tuesday", "Wednesday"]
+        month_names = ["January", "February", "March", "April", "May", "June"]
 
         forecast = IntentDefinition("GetWeatherForecast")
         named_days_sentence = SentenceBuilder().add_string("on", True, True) \
@@ -332,8 +331,10 @@ class TestRhasspyUpdater(TestCase):
         updater.update_rhasspy()
 
         self.assertEqual(2, requests_mock.call_count)
-        expected_intent_in_call = "[TestIntent]\n-5..31{Test!int}"
-        requests_mock.assert_has_calls([mock.call(self.SENTENCES_URL, expected_intent_in_call)])
+        expected_intent_in_call = "[GetWeatherForecast]\nday = ([on:] $day|(0..31) $month|in (0..7) days)\n\n"
+        expected_slots_in_call = """{"day": ["today", "tomorrow", "the day after tomorrow", "Monday", "Tuesday", "Wednesday"], "month": ["January", "February", "March", "April", "May", "June"]}"""
+        requests_mock.assert_has_calls([mock.call(self.SLOTS_URL, expected_slots_in_call),
+                                        mock.call(self.SENTENCES_URL, expected_intent_in_call)])
 
     @mock.patch("rhasspy.updater.requests.post")
     def test_optional_parameter_string_without_return(self, requests_mock):
