@@ -63,7 +63,7 @@ class IntentHandlerManager(IntentDefinitionSource, NewIntentObserver):
         """Returns all IntentDefinition of all IntentHandlers which are subscribed to the
         IntentHandlerManager"""
         all_intent_definitions = []
-        for intent_handler in self._intent_handlers.values():
+        for intent_handler in set(self._intent_handlers.values()):
             intent_definitions = intent_handler.intent_definitions
             all_intent_definitions.extend(intent_definitions)
         return all_intent_definitions
