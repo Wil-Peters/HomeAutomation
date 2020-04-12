@@ -101,6 +101,30 @@ class Sentence(object):
         self._sentence_parts.append(sentence_part)
 
 
+class Variable(object):
+    def __init__(self, name: str, sentences: List[Sentence]):
+        self._name = name
+        self._sentences = sentences
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def sentences(self) -> List[Sentence]:
+        return self._sentences
+
+    
+class VariableParameter(SentenceParameter):
+    def __init__(self, references: Variable, return_value=False, optional=False):
+        SentenceParameter.__init__(self, references.name, return_value, optional)
+        self._references: Variable = references
+
+    @property
+    def references(self) -> Variable:
+        return self._references
+
+
 class SentenceBuilder(object):
     def __init__(self):
         self._sentence = Sentence()
@@ -160,6 +184,7 @@ class IntentDefinition(object):
     def __init__(self, name: str, simple_single_sentence_string: str = None):
         self._name = name
         self._sentences = []
+        self._variables = []
         if simple_single_sentence_string:
             sentence = Sentence()
             sentence.add_string(simple_single_sentence_string)
@@ -178,3 +203,10 @@ class IntentDefinition(object):
     def sentences(self) -> List[Sentence]:
         """Returns the List of sentences inside the IntentDefinition"""
         return self._sentences
+
+    def add_variable(self, variable: Variable):
+        self._variables.append(variable)
+
+    @property
+    def variables(self) -> List[Variable]:
+        return self._variables

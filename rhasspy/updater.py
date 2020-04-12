@@ -9,7 +9,7 @@ from typing import Dict, List
 
 import requests
 
-from core.intentdefinition import IntentDefinition, NumberRangeParameter, SetParameter, StringParameter
+from core.intentdefinition import IntentDefinition, NumberRangeParameter, SentenceParameter, SetParameter, StringParameter, Variable, VariableParameter
 from core.intentdefinitionsource import IntentDefinitionSource
 from core.utils.classname import fullname
 
@@ -62,11 +62,33 @@ class RhasspyUpdater:
         if sentences:
             self._post_sentences(sentences)
 
+    def _get_string_for_variable(self, variable: Variable):
+        string = "{} = ".format(variable.name)
+        multiple_options = False
+        if len(variable.sentences) > 0:
+            multiple_options = True
+            string += "("
+        for sentence in variable.sentences:
+            for part in sentence:
+                string += self._get_part_string(part)
+                if part != sentence[-1]:
+                    string += " "
+            if sentence != variable.sentences[-1]:
+                string += "|"
+        if multiple_options:
+            string += ")"
+        return string
+
     def _generate_sentences(self, intent_definitions: List[IntentDefinition]):
         sentences = ""
         for intent_definition in intent_definitions:
             if intent_definition.name != "":
                 sentences += "[{}]\n".format(intent_definition.name)
+                for variable in intent_definition.variables:
+                    sentences += self._get_string_for_variable(variable)
+                    sentences += "\n"
+                if len(intent_definition.variables) > 0:
+                    sentences += "\n"
                 for sentence in intent_definition.sentences:
                     for part in sentence:
                         sentences += self._get_part_string(part)
@@ -89,6 +111,15 @@ class RhasspyUpdater:
                                                                              intent_definition.name,
                                                                              part)
                         slots[slot_name] = slot_value
+            for variable in intent_definition.variables:
+                for sentence in variable.sentences:
+                    for part in sentence:
+                        if isinstance(part, SetParameter) and \
+                                self._requires_slot_creation(part.possible_values):
+                            slot_name, slot_value = self._generate_slot_for_part(slots,
+                                                                                 intent_definition.name,
+                                                                                 part)
+                            slots[slot_name] = slot_value
         return slots
 
     @staticmethod
@@ -103,10 +134,12 @@ class RhasspyUpdater:
     def _get_part_string(self, part: SetParameter):
         return_value = ""
         if isinstance(part, StringParameter):
+            return_value = part.text
+            if part.substitute:
+                return_value += ":"
             if part.optional:
-                return_value = "[{}]".format(part.text)
-            else:
-                return_value = part.text
+                return_value = "[{}]".format(return_value)
+
         if isinstance(part, SetParameter):
             slot_name = part.name
             if self._requires_slot_creation(part.possible_values):
@@ -114,9 +147,18 @@ class RhasspyUpdater:
                              if values == part.possible_values][0]
             return_value = self._create_option_string(part, slot_name, part.return_value)
         if isinstance(part, NumberRangeParameter):
-            return_value = "{}..{}".format(part.lower_value, part.upper_value)
-            return_value += RhasspyUpdater.get_return_value_string_if_necessary(part.return_value,
-                                                                                part)
+            return_value = "({}..{})".format(part.lower_value, part.upper_value)
+            return_value += RhasspyUpdater._get_return_value_string_if_necessary(part.return_value,
+                                                                                 part)
+        if isinstance(part, VariableParameter):
+            return_value = "<{}>".format(part.name)
+            if part.return_value:
+                return_value += " {{{}}}".format(part.name)
+        if isinstance(part, SentenceParameter):
+            if part.optional:
+                return_value = "[{}]".format(return_value)
+
+
         return return_value
 
     @staticmethod
@@ -133,12 +175,12 @@ class RhasspyUpdater:
             option_string += ")"
         else:
             option_string += "${}".format(slot_name)
-        option_string += RhasspyUpdater.get_return_value_string_if_necessary(add_return_value,
-                                                                             parameter)
+        option_string += RhasspyUpdater._get_return_value_string_if_necessary(add_return_value,
+                                                                              parameter)
         return option_string
 
     @staticmethod
-    def get_return_value_string_if_necessary(add_return_value, parameter):
+    def _get_return_value_string_if_necessary(add_return_value, parameter):
         response = ""
         if add_return_value:
             f = "{{{}}}"

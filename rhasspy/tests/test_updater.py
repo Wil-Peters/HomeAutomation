@@ -2,7 +2,7 @@ import json
 from unittest import mock, TestCase
 from unittest.mock import Mock
 
-from core.intentdefinition import IntentDefinition, NumberRangeParameter, Sentence, SetParameter
+from core.intentdefinition import IntentDefinition, NumberRangeParameter, Sentence, SentenceBuilder, SetParameter, Variable
 from rhasspy.updater import RhasspyUpdater
 
 
@@ -299,6 +299,82 @@ class TestRhasspyUpdater(TestCase):
         updater.update_rhasspy()
 
         requests_mock.assert_called_once()
+        expected_intent_in_call = "[TestIntent]\n(-5..31){Test!int}"
+        requests_mock.assert_has_calls([mock.call(self.SENTENCES_URL, expected_intent_in_call)])
+
+    @mock.patch("rhasspy.updater.requests.post")
+    def test_variable(self, requests_mock):
+        named_days = ["today", "tomorrow", "the day after tomorrow"]
+        weekday_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        month_names = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+                       "November", "December"]
+
+        forecast = IntentDefinition("GetWeatherForecast")
+        named_days_sentence = SentenceBuilder().add_string("on", True, True) \
+            .add_parameter(SetParameter("day", possible_values=named_days + weekday_names))\
+            .build()
+        date_sentence = SentenceBuilder().add_parameter(NumberRangeParameter("date", lower=0, upper=31)) \
+            .add_parameter(SetParameter("month", possible_values=month_names))\
+            .build()
+        in_days_sentence = SentenceBuilder().add_string("in") \
+            .add_parameter(NumberRangeParameter("days", lower=0, upper=7)) \
+            .add_string("days")\
+            .build()
+
+        day_variable = Variable("day", [named_days_sentence, date_sentence, in_days_sentence])
+
+        forecast.add_variable(day_variable)
+
+        intent_definition_source_mock = Mock()
+        intent_definition_source_mock.get_intent_definitions.return_value = [forecast]
+        updater = RhasspyUpdater(intent_definition_source_mock)
+
+        updater.update_rhasspy()
+
+        self.assertEqual(2, requests_mock.call_count)
         expected_intent_in_call = "[TestIntent]\n-5..31{Test!int}"
         requests_mock.assert_has_calls([mock.call(self.SENTENCES_URL, expected_intent_in_call)])
 
+    @mock.patch("rhasspy.updater.requests.post")
+    def test_optional_parameter_string_without_return(self, requests_mock):
+        values = ["One", "Two", "Three", "Four", "Five", "Six"]
+        parameter = SetParameter("Test", possible_values=values, optional=True)
+        sentence = Sentence()
+        sentence.add_parameter(parameter)
+        intent_definition = IntentDefinition("TestIntent")
+        intent_definition.add_sentence(sentence)
+
+        intent_definition_source_mock = Mock()
+        intent_definition_source_mock.get_intent_definitions.return_value = [intent_definition]
+        updater = RhasspyUpdater(intent_definition_source_mock)
+
+        expected_json = {"Test": ["One", "Two", "Three", "Four", "Five", "Six"]}
+
+        updater.update_rhasspy()
+
+        calls = [mock.call(self.SLOTS_URL, json.dumps(expected_json)),
+                 mock.call(self.SENTENCES_URL, "[TestIntent]\n[$Test]")]
+        self.assertEqual(2, requests_mock.call_count)
+        requests_mock.assert_has_calls(calls)
+
+    @mock.patch("rhasspy.updater.requests.post")
+    def test_optional_parameter_string_with_return(self, requests_mock):
+        values = ["One", "Two", "Three", "Four", "Five", "Six"]
+        parameter = SetParameter("Test", return_value=True, possible_values=values, optional=True)
+        sentence = Sentence()
+        sentence.add_parameter(parameter)
+        intent_definition = IntentDefinition("TestIntent")
+        intent_definition.add_sentence(sentence)
+
+        intent_definition_source_mock = Mock()
+        intent_definition_source_mock.get_intent_definitions.return_value = [intent_definition]
+        updater = RhasspyUpdater(intent_definition_source_mock)
+
+        expected_json = {"Test": ["One", "Two", "Three", "Four", "Five", "Six"]}
+
+        updater.update_rhasspy()
+
+        calls = [mock.call(self.SLOTS_URL, json.dumps(expected_json)),
+                 mock.call(self.SENTENCES_URL, "[TestIntent]\n[$Test{Test}]")]
+        self.assertEqual(2, requests_mock.call_count)
+        requests_mock.assert_has_calls(calls)
