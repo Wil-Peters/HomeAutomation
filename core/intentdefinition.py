@@ -182,9 +182,9 @@ class IntentDefinition(object):
 
         """
     def __init__(self, name: str, simple_single_sentence_string: str = None):
-        self._name = name
-        self._sentences = []
-        self._variables = []
+        self._name: str = name
+        self._sentences: List[Sentence] = []
+        self._variables: List[Variable] = []
         if simple_single_sentence_string:
             sentence = Sentence()
             sentence.add_string(simple_single_sentence_string)
