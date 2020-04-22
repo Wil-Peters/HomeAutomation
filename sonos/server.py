@@ -33,10 +33,6 @@ class SpeechFileServer(object):
         handler = http.server.SimpleHTTPRequestHandler
         handler.extensions_map.update({'.webapp': 'application/x-web-app-manifest+json'})
 
-        folder_name = "speech_files"
-        if not os.path.exists(folder_name):
-            os.mkdir(folder_name)
-        os.chdir(folder_name)
         httpd = socketserver.TCPServer(("", self._port), handler)
 
         self._address = socket.gethostbyname(socket.gethostname()) + ":%s" % self._port
