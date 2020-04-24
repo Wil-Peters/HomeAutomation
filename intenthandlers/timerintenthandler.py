@@ -18,11 +18,11 @@ class TimerIntenthandler(AsyncVoiceSource, IntentHandler):
         AsyncVoiceSource.__init__(self)
         IntentHandler.__init__(self)
 
-        get_time_intent_definition = self.create_get_time_intent_definition()
+        get_time_intent_definition = self._create_get_time_intent_definition()
         self._intent_definitions = [get_time_intent_definition]
 
-    def create_get_time_intent_definition(self) -> IntentDefinition:
-        room_on_off = IntentDefinition("SetTimer")
+    def _create_get_time_intent_definition(self) -> IntentDefinition:
+        set_timer = IntentDefinition("SetTimer")
 
         numbers_parameter = NumberRangeParameter(self.AMOUNT, True, lower=0, upper=60)
         time_unit_parameter = SetParameter(self.TIMEUNIT, True, possible_values=[self.SECONDS,
@@ -35,8 +35,8 @@ class TimerIntenthandler(AsyncVoiceSource, IntentHandler):
             .add_string("from now", True)
 
         sentence = sentence_builder.build()
-        room_on_off.add_sentence(sentence)
-        return room_on_off
+        set_timer.add_sentence(sentence)
+        return set_timer
 
     def _timer_expired(self):
         self._listener.trigger(Reminder("Timer expired"))
