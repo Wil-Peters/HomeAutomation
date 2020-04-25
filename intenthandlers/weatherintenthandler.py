@@ -31,4 +31,4 @@ class WeatherIntentHandler(IntentHandler):
         content = json.loads(response.content)
         temp = content['main']['temp']
         temp_celsius = int(temp - 273)
-        return "At the moment it's {} degrees outside".format(temp_celsius)
+        return "At the moment it's {} degrees outside".format(temp_celsius), False

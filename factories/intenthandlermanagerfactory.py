@@ -12,7 +12,6 @@ from intenthandlers.hue.roomdimmer import RoomDimmer
 from intenthandlers.teamspeak import TeamspeakIntentHandler
 from intenthandlers.timeintenthandler import TimeIntentHandler
 from intenthandlers.timerintenthandler import TimerIntenthandler
-from intenthandlers.unknownintenthandler import UnknownIntentHandler
 from intenthandlers.weatherintenthandler import WeatherIntentHandler
 
 
@@ -33,7 +32,6 @@ class IntentHandlerManagerFactory(object):
                                                 RoomDimmer(),
                                                 TeamspeakIntentHandler(),
                                                 TimeIntentHandler(),
-                                                UnknownIntentHandler(),
                                                 WeatherIntentHandler()
                                                 ]
 

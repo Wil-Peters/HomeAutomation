@@ -41,4 +41,4 @@ class LightsInRoomOnOffHandler(IntentHandler):
         self._hue_manager.send_room_command_to_bridge(intent.parameters[self.ROOM], json.dumps(payload))
         room = intent.parameters[self.ROOM]
         on_off = intent.parameters[self.ONOFF].lower()
-        return "Turning the lights in the {} {}".format(room, on_off)
+        return "Turning the lights in the {} {}".format(room, on_off), False

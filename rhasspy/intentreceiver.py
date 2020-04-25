@@ -1,11 +1,15 @@
 """Module that handles intents coming from Rhasspy. Rhasspy intents are converted to
 core.intent.Intent objects and then passed to any NewIntentObservers which are listening"""
+import configparser
 import json
 import logging
+import os
 import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from io import BytesIO
 from threading import Thread
+
+import requests
 
 from core.intent import Intent
 from core.newintentobserver import NewIntentObserver
@@ -39,11 +43,29 @@ class RhasspyIntentReceiver(NewIntentSubject):
     HOST = ''
     PORT = 8081
     _intent_listener = None
+    _timer = None
+    api_url = None
 
     def __init__(self):
         self._logger = logging.getLogger(fullname(self))
         thread = Thread(target=self._run_server, daemon=True)
         thread.start()
+
+        conversation_mode_thread = Thread(target=self._start_conversation_mode, daemon=True)
+        conversation_mode_thread.start()
+
+        config = configparser.ConfigParser()
+        config_file = os.path.dirname(os.path.abspath(__file__)) + "/config.ini"
+        config.read(config_file)
+        RhasspyIntentReceiver.api_url = config["Rhasspy"]["Speaker"]
+
+    def _start_conversation_mode(self):
+        RhasspyIntentReceiver._intent_handled = False
+        while True:
+            time.sleep(1)
+            if RhasspyIntentReceiver._intent_handled:
+                RhasspyIntentReceiver._intent_handled = False
+                requests.post(RhasspyIntentReceiver.api_url + "/listen-for-command")
 
     def handle_new_intent(self, intent_string: str):
         """Typically called from the SimpleHTTPRequestHandler.do_POST method, this method takes
@@ -54,8 +76,12 @@ class RhasspyIntentReceiver(NewIntentSubject):
         self._logger.info("Received intent: %s", intent_string)
         intent = self._create_intent_object(intent_string)
         response = ""
-        if RhasspyIntentReceiver._intent_listener:
-            response = RhasspyIntentReceiver._intent_listener.update(intent)
+        if intent.name != "" and intent.full_intent_string != "":
+            if RhasspyIntentReceiver._intent_listener:
+                response, continue_dialog = RhasspyIntentReceiver._intent_listener.update(intent)
+                if continue_dialog:
+                    RhasspyIntentReceiver._intent_handled = True
+        self._logger.info("Response: {}".format(response))
         return self._create_return_body(intent, incoming_time, response)
 
     def attach(self, observer: NewIntentObserver):

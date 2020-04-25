@@ -67,4 +67,4 @@ class RoomDimmer(IntentHandler):
         payload = {"bri_inc": bri_inc}
         self._hue_manager.send_room_command_to_bridge(intent.parameters[self.ROOM], json.dumps(
             payload))
-        return response
+        return response, False

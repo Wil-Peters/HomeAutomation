@@ -18,4 +18,4 @@ class TimeIntentHandler(IntentHandler):
     def handle_intent(intent: Intent) -> str:
         localtime = time.localtime()
         time_string = time.strftime("%H:%M", localtime)
-        return "It is currently {} o'clock".format(time_string)
+        return "It is currently {} o'clock".format(time_string), False

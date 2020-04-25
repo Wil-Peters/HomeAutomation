@@ -25,21 +25,22 @@ class IntentHandlerManager(IntentDefinitionSource, NewIntentObserver):
         """Implements NewIntentObserver.update. Gets called when the NewIntentSubject has a new
         Intent for its observers."""
         if intent.name in self._intent_handlers.keys():
-            text_to_speak = self._handle_intent(intent)
+            text_to_speak, continue_dialog = self._handle_intent(intent)
         else:
             self._logger.info("Intent Manager: no intenthandler registered for: %s", intent.name)
             text_to_speak = "I do not know how to %s" % intent.full_intent_string
         if self._speaker:
             self._speaker.speak_text(text_to_speak)
-            return ""
+            return "", continue_dialog
         else:
-            return text_to_speak
+            return text_to_speak, continue_dialog
 
     def _handle_intent(self, intent) -> str:
         result = ""
         self._logger.info("Intent Manager: dispatching intent '%s'", intent.name)
+        continue_dialog = False
         try:
-            response = self._intent_handlers[intent.name].handle_intent(intent)
+            response, continue_dialog = self._intent_handlers[intent.name].handle_intent(intent)
             if response:
                 result = response
         except Exception as exception:
@@ -47,7 +48,7 @@ class IntentHandlerManager(IntentDefinitionSource, NewIntentObserver):
                               fullname(self._intent_handlers[intent.name]), exception)
             result = "Something went wrong while handling your request: %s" % \
                      intent.full_intent_string
-        return result
+        return result, continue_dialog
 
     def subscribe_intent_handler(self, intent_handler: IntentHandler):
         """Subscribe a new IntentHandler that can handle Intents. Stores the IntentDefinitions

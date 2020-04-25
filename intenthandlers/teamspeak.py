@@ -40,4 +40,4 @@ class TeamspeakIntentHandler(IntentHandler):
         start_stop_server_bash_command = TeamspeakIntentHandler.COMMAND.format(action.lower())
         process = subprocess.Popen(start_stop_server_bash_command.split(), stdout=subprocess.PIPE)
         process.communicate()
-        return TeamspeakIntentHandler._create_response_string(action)
+        return TeamspeakIntentHandler._create_response_string(action), False

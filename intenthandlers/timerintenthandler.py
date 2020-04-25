@@ -49,4 +49,4 @@ class TimerIntenthandler(AsyncVoiceSource, IntentHandler):
             seconds = int(intent.parameters[self.AMOUNT]) * 60
         timer = threading.Timer(seconds, self._timer_expired)
         timer.start()
-        return "I've set a timer for {} seconds from now".format(seconds)
+        return "I've set a timer for {} seconds from now".format(seconds), False

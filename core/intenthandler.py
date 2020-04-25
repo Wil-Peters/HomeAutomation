@@ -31,7 +31,7 @@ class IntentHandler(ABC):
         core.intentdefinition.IntentDefinition class"""
         return self._intent_definitions
 
-    def handle_intent(self, intent: Intent) -> str:
+    def handle_intent(self, intent: Intent) -> (str, bool):
         """Is called by the IntentHandlerManager when it receives an Intent, of which the
         IntentHandler published an IntentDefinition"""
         pass
