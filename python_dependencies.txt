@@ -2,3 +2,4 @@ requests
 soco
 coverage
 mypy
+imap-tools
