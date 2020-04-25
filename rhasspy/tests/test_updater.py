@@ -100,7 +100,7 @@ class TestRhasspyUpdater(TestCase):
         calls = [mock.call(self.SLOTS_URL, json.dumps(expected_json)),
                  mock.call(self.SENTENCES_URL, "[TestIntent]\n$Test")]
         self.assertEqual(2, requests_mock.call_count)
-        requests_mock.assert_has_calls(calls)
+        requests_mock.assert_has_calls(calls, any_order=True)
 
     @mock.patch("rhasspy.updater.requests.post")
     def test_create_option_string_with_return(self, requests_mock):
@@ -118,7 +118,7 @@ class TestRhasspyUpdater(TestCase):
 
         requests_mock.assert_called_once()
         expected_intent_in_call = "[TestIntent]\n(One | Two | Three | Four | Five){Test}"
-        requests_mock.assert_has_calls([mock.call(self.SENTENCES_URL, expected_intent_in_call)])
+        requests_mock.assert_has_calls([mock.call(self.SENTENCES_URL, expected_intent_in_call)], any_order=True)
 
     @mock.patch("rhasspy.updater.requests.post")
     def test_create_parameter_string_with_return(self, requests_mock):
@@ -139,7 +139,7 @@ class TestRhasspyUpdater(TestCase):
         calls = [mock.call(self.SLOTS_URL, json.dumps(expected_json)),
                  mock.call(self.SENTENCES_URL, "[TestIntent]\n$Test{Test}")]
         self.assertEqual(2, requests_mock.call_count)
-        requests_mock.assert_has_calls(calls)
+        requests_mock.assert_has_calls(calls, any_order=True)
 
     @mock.patch("rhasspy.updater.requests.post")
     def test_create_multiple_parameters(self, requests_mock):
@@ -166,7 +166,7 @@ class TestRhasspyUpdater(TestCase):
         calls = [mock.call(self.SLOTS_URL, json.dumps(expected_json)),
                  mock.call(self.SENTENCES_URL, "[TestIntent]\n$Test1{Test1} $Test2{Test2}")]
         self.assertEqual(2, requests_mock.call_count)
-        requests_mock.assert_has_calls(calls)
+        requests_mock.assert_has_calls(calls, any_order=True)
 
     @mock.patch("rhasspy.updater.requests.post")
     def test_one_intent_two_sentence(self, requests_mock):
@@ -241,7 +241,7 @@ class TestRhasspyUpdater(TestCase):
         calls = [mock.call(self.SLOTS_URL, json.dumps(expected_json)),
                  mock.call(self.SENTENCES_URL, expected_intents)]
         self.assertEqual(2, requests_mock.call_count)
-        requests_mock.assert_has_calls(calls)
+        requests_mock.assert_has_calls(calls, any_order=True)
 
     @mock.patch("rhasspy.updater.requests.post")
     def test_two_slots_same_name_same_values(self, requests_mock):
@@ -270,7 +270,7 @@ class TestRhasspyUpdater(TestCase):
         calls = [mock.call(self.SLOTS_URL, json.dumps(expected_json)),
                  mock.call(self.SENTENCES_URL, expected_intents)]
         self.assertEqual(2, requests_mock.call_count)
-        requests_mock.assert_has_calls(calls)
+        requests_mock.assert_has_calls(calls, any_order=True)
 
     @mock.patch("rhasspy.updater.requests.post")
     def test_empty_intent_definition(self, requests_mock):
@@ -300,7 +300,7 @@ class TestRhasspyUpdater(TestCase):
 
         requests_mock.assert_called_once()
         expected_intent_in_call = "[TestIntent]\n(-5..31){Test!int}"
-        requests_mock.assert_has_calls([mock.call(self.SENTENCES_URL, expected_intent_in_call)])
+        requests_mock.assert_has_calls([mock.call(self.SENTENCES_URL, expected_intent_in_call)], any_order=True)
 
     @mock.patch("rhasspy.updater.requests.post")
     def test_variable(self, requests_mock):
@@ -334,7 +334,7 @@ class TestRhasspyUpdater(TestCase):
         expected_intent_in_call = "[GetWeatherForecast]\nday = ([on:] $day|(0..31) $month|in (0..7) days)\n\n"
         expected_slots_in_call = """{"day": ["today", "tomorrow", "the day after tomorrow", "Monday", "Tuesday", "Wednesday"], "month": ["January", "February", "March", "April", "May", "June"]}"""
         requests_mock.assert_has_calls([mock.call(self.SLOTS_URL, expected_slots_in_call),
-                                        mock.call(self.SENTENCES_URL, expected_intent_in_call)])
+                                        mock.call(self.SENTENCES_URL, expected_intent_in_call)], any_order=True)
 
     @mock.patch("rhasspy.updater.requests.post")
     def test_optional_parameter_string_without_return(self, requests_mock):
@@ -356,7 +356,7 @@ class TestRhasspyUpdater(TestCase):
         calls = [mock.call(self.SLOTS_URL, json.dumps(expected_json)),
                  mock.call(self.SENTENCES_URL, "[TestIntent]\n[$Test]")]
         self.assertEqual(2, requests_mock.call_count)
-        requests_mock.assert_has_calls(calls)
+        requests_mock.assert_has_calls(calls, any_order=True)
 
     @mock.patch("rhasspy.updater.requests.post")
     def test_optional_parameter_string_with_return(self, requests_mock):
@@ -378,4 +378,4 @@ class TestRhasspyUpdater(TestCase):
         calls = [mock.call(self.SLOTS_URL, json.dumps(expected_json)),
                  mock.call(self.SENTENCES_URL, "[TestIntent]\n[$Test{Test}]")]
         self.assertEqual(2, requests_mock.call_count)
-        requests_mock.assert_has_calls(calls)
+        requests_mock.assert_has_calls(calls, any_order=True)

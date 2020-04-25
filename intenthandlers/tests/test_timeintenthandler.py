@@ -23,7 +23,7 @@ class TestTimeIntentHandler(TestCase):
     def test_handle_intent(self):
         localtime = time.localtime()
         time_string = time.strftime("%H:%M", localtime)
-        expected_response = "It is currently {} o'clock".format(time_string)
+        expected_response = "It is currently {} o'clock".format(time_string), False
 
         intent = Intent("GetTime", {})
         intent_manager = IntentHandlerManager()

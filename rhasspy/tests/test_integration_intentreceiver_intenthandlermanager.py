@@ -27,7 +27,7 @@ class TestIntentReceiverIntentHandlerManagerIntegration(TestCase):
     def test_new_intent(self):
         mock_intent_handler = Mock()
         mock_intent_handler.intent_definitions = [IntentDefinition("Test", "Test text")]
-        mock_intent_handler.handle_intent = MagicMock(return_value="Test response")
+        mock_intent_handler.handle_intent = MagicMock(return_value=("Test response", False))
 
         intent_handler_manager = IntentHandlerManager()
         intent_receiver = RhasspyIntentReceiver()
@@ -43,7 +43,7 @@ class TestIntentReceiverIntentHandlerManagerIntegration(TestCase):
     def test_new_intent_without_response(self):
         mock_intent_handler = Mock()
         mock_intent_handler.intent_definitions = [IntentDefinition("Test", "Test text")]
-        mock_intent_handler.handle_intent = MagicMock(return_value=None)
+        mock_intent_handler.handle_intent = MagicMock(return_value=(None, False))
 
         intent_handler_manager = IntentHandlerManager()
         intent_receiver = RhasspyIntentReceiver()

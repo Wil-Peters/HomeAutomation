@@ -24,6 +24,7 @@ class IntentHandlerManager(IntentDefinitionSource, NewIntentObserver):
     def update(self, intent: Intent) -> str:
         """Implements NewIntentObserver.update. Gets called when the NewIntentSubject has a new
         Intent for its observers."""
+        continue_dialog = False
         if intent.name in self._intent_handlers.keys():
             text_to_speak, continue_dialog = self._handle_intent(intent)
         else:

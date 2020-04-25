@@ -52,7 +52,7 @@ class TestRhasspyIntentReceiver(TestCase):
         try:
             rhasspy_intent_receiver = RhasspyIntentReceiver()
             mock_new_intent_observer = Mock()
-            mock_new_intent_observer.update = MagicMock(return_value="Test response")
+            mock_new_intent_observer.update = MagicMock(return_value=("Test response", False))
 
             rhasspy_intent_receiver.attach(mock_new_intent_observer)
             rhasspy_intent_receiver.handle_new_intent(self.intent_string)
