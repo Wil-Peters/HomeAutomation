@@ -14,6 +14,8 @@ from intenthandlers.timeintenthandler import TimeIntentHandler
 from intenthandlers.timerintenthandler import TimerIntenthandler
 from intenthandlers.weatherintenthandler import WeatherIntentHandler
 
+from mail.mail_handler import MailHandler
+
 
 class IntentHandlerManagerFactory(object):
     """Factory that creates an IntentHandlerManager object"""
@@ -32,7 +34,8 @@ class IntentHandlerManagerFactory(object):
                                                 RoomDimmer(),
                                                 TeamspeakIntentHandler(),
                                                 TimeIntentHandler(),
-                                                WeatherIntentHandler()
+                                                WeatherIntentHandler(),
+                                                MailHandler()
                                                 ]
 
         async_voice_sources : List[AsyncVoiceSource] = []
