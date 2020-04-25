@@ -34,7 +34,9 @@ class RhasspyUpdater:
         url = self._api_url + "/slots?overwrite_all=true"
         payload = json.dumps(slots)
         self._logger.info(payload)
-        requests.post(url, payload)
+        response = requests.post(url, payload)
+        if response.status_code != 200:
+            self._logger.error(response.content)
 
     def _post_sentences(self, sentences: str):
         url = self._api_url + "/sentences"
